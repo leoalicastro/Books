@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite books</title>
+</head>
+<body>
+    <h3>Welcome {{users.fname}}</h3>
+    <a href="/logout">Logout</a>
+    <hr>
+    <h2>Add a favorite book</h2>
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{% if message.tags %} {{ message }} {% endif %}</li>
+            {% endfor %}
+    {% endif %}
+    <form action="/add_book" method="POST">
+        {% csrf_token %}
+        <label for="title">Title:</label>
+        <input type="text" name="title" required>
+        <p><label for="desc">Description:</label>
+        <input type="text" name="desc"></p>
+        <input type="hidden" name="uploaded_by">
+        <input type="hidden" name="favorite">
+        <p><button>Add</button></p>
+    </form>
+    <h4>All books</h4>
+    {% for book in books %}
+        <p><li><a href="/details/{{ book.id }}">{{book.title}}</a></li>
+        <li>Added by {{book.uploaded_by.fname}} {{book.uploaded_by.lname}}</li>
+        {% if users not in book.users_who_like.all %}
+        <form action="/favorite/{{ book.id }}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="users_who_like"><button>Add to favorites</button></li></p>
+        </form>
+        {% endif %}
+        {% if users in book.users_who_like.all %}
+            <form action="/unfavorite/{{ book.id }}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="users_who_like"><button>Unfavorite</button></li></p>
+            </form>  
+        {% endif %} 
+    {% endfor %}
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book details</title>
+</head>
+<body>
+    <h3>Welcome {{user.fname}}</h3>
+    <a href="/home">Home</a>
+    <a href="/logout">Logout</a>
+    <hr>
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{% if message.tags %} {{ message }} {% endif %}</li>
+            {% endfor %}
+    {% endif %}
+    {% if book.uploaded_by.id == user.id %}
+        <form action="/edit/{{ book.id }}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="title" value ="{{book.title}}">
+            <p>Added by {{book.uploaded_by.fname}} {{book.uploaded_by.lname}}</p>
+            <p>Added on {{book.created_at}}</p>
+            <p>Updated at {{book.updated_at}}</p>
+            <p><input type ="desc" name="desc" value="{{book.desc}}"></p>
+            <button>Update</button>
+        </form>
+        <form action="/delete/{{ book.id }}" method="POST">
+            {% csrf_token %}
+            <button>Delete</button>
+        </form>
+    {% endif %}
+    {% if book.uploaded_by.id != user.id %}
+        <p>{{book.title}}</p>
+        <p>Added by {{book.uploaded_by.fname}} {{book.uploaded_by.lname}}</p>
+        <p>Added on {{book.created_at}}</p>
+        <p>Updated at {{book.updated_at}}</p>
+        <p>{{book.desc}}</p>
+    {% endif %}
+    <h3>Users who like this book</h3>
+    {% for favorite in book.users_who_like.all %}
+        <li>{{favorite.fname}}</li>
+    {% endfor %}
+        {% if user in book.users_who_like.all %}
+            <form action="/unfavorite/again/{{book.id}}" method="POST">
+                {% csrf_token %}
+                <button>Unfavorite</button>
+            </form>
+        {% endif %}
+        {% if user not in book.users_who_like.all %}
+        <form action="/favorite/{{ book.id }}" method="POST">
+            {% csrf_token %}
+            <button>Add to favorites</button>
+        </form>
+        {% endif %}
+</body>
+</html>
